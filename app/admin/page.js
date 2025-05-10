@@ -44,7 +44,7 @@ export default async function AdminPage() {
         </Link>
         <Link
           className="inline-flex gap-2 border rounded-xl border-gray-400 text-gray-800 px-3 py-2"
-          href="/admin/users"
+          href="/admin/items"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

@@ -3,6 +3,28 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import {
+  FaGithub,
+  FaTwitter,
+  FaLinkedin,
+  FaInstagram,
+  FaYoutube,
+  FaFacebook,
+  FaTiktok,
+  FaGlobe,
+} from "react-icons/fa";
+
+const platformIcons = {
+  GitHub: FaGithub,
+  Twitter: FaTwitter,
+  LinkedIn: FaLinkedin,
+  Instagram: FaInstagram,
+  YouTube: FaYoutube,
+  Facebook: FaFacebook,
+  TikTok: FaTiktok,
+  Website: FaGlobe,
+};
+
 export default async function PublicProfilePage({ params }) {
   const { username } = await params;
 
@@ -47,14 +69,41 @@ export default async function PublicProfilePage({ params }) {
             alt={user.name || username}
             width={64}
             height={64}
-            className="rounded-full"
+            className="rounded-full w-16 h-16 object-cover"
           />
         )}
         <div>
           <h1 className="text-2xl font-bold">{user.name || username}</h1>
           <p className="text-gray-600 text-sm">@{username}</p>
+          {user.bio && <p className="text-gray-700 mt-1">{user.bio}</p>}
         </div>
       </div>
+
+      {user.socialLinks &&
+        Array.isArray(user.socialLinks) &&
+        user.socialLinks.length > 0 && (
+          <div className="mb-6 space-y-2">
+            <h2 className="text-lg font-semibold">Social Links</h2>
+            <ul className="flex flex-wrap gap-2">
+              {user.socialLinks.map((link, index) => {
+                const Icon = platformIcons[link.platform] || FaGlobe;
+                return (
+                  <li key={index}>
+                    <a
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 px-2 py-1 border rounded text-sm hover:bg-gray-100"
+                    >
+                      <Icon size={16} className="text-black" />
+                      <span>{link.platform}</span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
 
       {/* Inventory Display */}
       <h2 className="text-xl font-semibold mb-4">Inventory</h2>

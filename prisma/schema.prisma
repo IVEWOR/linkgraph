@@ -32,22 +32,23 @@ enum SourceType {
 }
 
 model User {
-  id             String    @id @default(cuid())
-  email          String    @unique
-  emailVerified  DateTime?
-  name           String?
-  username       String?   @unique
-  image          String?
-  role           Role      @default(USER)
-  plan           Plan      @default(FREE)
-  stripeId       String?   @unique
-  inventory      Inventory?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-
-  accounts       Account[]
-  sessions       Session[]
+  id          String    @id @default(cuid())
+  email       String    @unique
+  name        String?
+  username    String?   @unique
+  image       String?   
+  bio         String?   @db.VarChar(300)
+  socialLinks Json?    
+  role        Role      @default(USER)
+  plan        Plan      @default(FREE)
+  stripeId    String?   @unique
+  inventory   Inventory?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  accounts    Account[]
+  sessions    Session[]
 }
+
 
 
 model Inventory {

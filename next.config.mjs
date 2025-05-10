@@ -2,8 +2,22 @@
 const nextConfig = {
   images: {
     remotePatterns: [
-      new URL("https://lh3.googleusercontent.com/**"),
-      new URL("https://github.com/**"),
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+      },
+      {
+        protocol: "https",
+        hostname: "github.com",
+      },
+      {
+        protocol: "https",
+        hostname: "i.pravatar.cc",
+      },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
     ],
   },
 };
