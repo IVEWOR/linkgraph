@@ -1,3 +1,5 @@
+// app/[username]/page.js
+
 import prisma from "@/lib/prisma";
 import Image from "next/image";
 import Link from "next/link";
@@ -27,127 +29,140 @@ const platformIcons = {
 
 export default async function PublicProfilePage({ params }) {
   const { username } = await params;
-
   const user = await prisma.user.findUnique({
     where: { username },
     include: {
       inventory: {
         include: {
-          items: {
-            include: {
-              item: true,
-            },
-          },
+          items: { include: { item: true } },
         },
       },
     },
   });
-
-  // 1. If user not found
   if (!user) return notFound();
-
-  // 2. If user is on FREE plan, redirect or show upgrade page
   if (user.plan !== "PRO") {
     return (
-      <div className="max-w-xl mx-auto py-20 px-4 text-center">
-        <h1 className="text-2xl font-semibold mb-4">{user.name || username}</h1>
-        <p className="text-gray-600 mb-4">This profile is private.</p>
-        <Link href="/" className="text-blue-600 underline">
-          Go back to homepage
-        </Link>
+      <div className="min-h-screen flex items-center justify-center p-6">
+        <div className="text-center">
+          <h1 className="text-2xl font-semibold">Profile is Private</h1>
+          <p className="mt-2 text-gray-600">
+            Upgrade to PRO to view this profile.
+          </p>
+          <Link href="/" className="mt-4 inline-block text-blue-600 underline">
+            Back Home
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      {/* Profile Header */}
-      <div className="flex items-center gap-4 mb-6">
-        {user.image && (
-          <Image
-            src={user.image}
-            alt={user.name || username}
-            width={64}
-            height={64}
-            className="rounded-full w-16 h-16 object-cover"
-          />
-        )}
-        <div>
-          <h1 className="text-2xl font-bold">{user.name || username}</h1>
-          <p className="text-gray-600 text-sm">@{username}</p>
-          {user.bio && <p className="text-gray-700 mt-1">{user.bio}</p>}
-        </div>
-      </div>
-
-      {user.socialLinks &&
-        Array.isArray(user.socialLinks) &&
-        user.socialLinks.length > 0 && (
-          <div className="mb-6 space-y-2">
-            <h2 className="text-lg font-semibold">Social Links</h2>
-            <ul className="flex flex-wrap gap-2">
-              {user.socialLinks.map((link, index) => {
-                const Icon = platformIcons[link.platform] || FaGlobe;
-                return (
-                  <li key={index}>
-                    <a
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1 px-2 py-1 border rounded text-sm hover:bg-gray-100"
-                    >
-                      <Icon size={16} className="text-black" />
-                      <span>{link.platform}</span>
-                    </a>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        )}
-
-      {/* Inventory Display */}
-      <h2 className="text-xl font-semibold mb-4">Inventory</h2>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {user.inventory?.items?.map((i) => {
-          const displayName = i.customName || i.item.name;
-          const displayDesc = i.customDesc || i.item.description;
-          const displayUrl = i.customUrl || i.item.url;
-          const displayImage = i.item.imageUrl;
-
-          return (
-            <div
-              key={i.id}
-              className="border rounded-xl p-4 bg-white shadow-sm flex flex-col gap-2"
-            >
-              <div className="flex items-center gap-3">
-                {displayImage && (
+    <main className="min-h-screen bg-gray-50 py-12">
+      <div className="max-w-screen-lg mx-auto px-4">
+        <div className="flex flex-col md:flex-row gap-8">
+          {/* ── Left Sidebar ── */}
+          <aside className="md:w-1/3">
+            <div className="sticky top-20 bg-white p-6 rounded-xl shadow">
+              {user.image && (
+                <div className="w-32 h-32 mx-auto mb-4 overflow-hidden rounded-full">
                   <Image
-                    src={displayImage}
-                    alt={displayName}
-                    width={40}
-                    height={40}
-                    className="rounded"
+                    src={user.image}
+                    alt={user.name || username}
+                    width={128}
+                    height={128}
+                    className="object-cover"
                   />
-                )}
-                <h3 className="text-lg font-medium">{displayName}</h3>
-              </div>
-              {displayDesc && (
-                <p className="text-gray-600 text-sm">{displayDesc}</p>
+                </div>
               )}
-              {displayUrl && (
-                <a
-                  href={displayUrl}
-                  className="text-blue-600 text-sm underline"
-                  target="_blank"
-                >
-                  {displayUrl}
-                </a>
+              <h1 className="text-2xl font-bold text-center">
+                {user.name || username}
+              </h1>
+              <p className="text-gray-500 text-center mb-4">@{username}</p>
+              {user.bio && (
+                <p className="text-gray-700 text-sm mb-4">{user.bio}</p>
+              )}
+              {Array.isArray(user.socialLinks) &&
+                user.socialLinks.length > 0 && (
+                  <div className="flex flex-wrap justify-center gap-2">
+                    {user.socialLinks.map((link, i) => {
+                      const Icon = platformIcons[link.platform] || FaGlobe;
+                      return (
+                        <Link
+                          key={i}
+                          href={link.url}
+                          target="_blank"
+                          className="flex items-center gap-1 px-3 py-1 border rounded-full text-sm hover:bg-gray-100"
+                        >
+                          <Icon size={16} className="text-black" />
+                          <span>{link.platform}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+            </div>
+          </aside>
+
+          {/* ── Right Content ── */}
+          <section className="md:w-2/3">
+            <div>
+              {/* <h2 className="text-2xl font-semibold mb-6">Inventory</h2> */}
+              {user.inventory?.items?.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {user.inventory.items.map((entry) => {
+                    const { item } = entry;
+                    const title = entry.customName || item.name;
+                    const desc = entry.customDesc || item.description;
+                    const url = entry.customUrl || item.url;
+
+                    return (
+                      <div
+                        key={entry.id}
+                        className="relative p-3 bg-white rounded-xl shadow-sm hover:shadow-md transition"
+                      >
+                        <div className="flex items-center gap-3">
+                          {item.imageUrl ? (
+                            <div className="w-20 h-20 overflow-hidden rounded-xl bg-zinc-100 flex items-center justify-center">
+                              <Image
+                                src={item.imageUrl}
+                                alt={title}
+                                width={60}
+                                height={60}
+                                className="object-cover rounded-xl"
+                              />
+                            </div>
+                          ) : (
+                            <div className="w-10 h-10 bg-gray-200 rounded" />
+                          )}
+                          <div>
+                            <h3 className="text-lg font-medium">{title}</h3>
+                            {desc && (
+                              <p className="text-gray-600 text-sm">{desc}</p>
+                            )}
+                          </div>
+                        </div>
+                        {url && (
+                          <>
+                            <Link
+                              href={url}
+                              target="_blank"
+                              className="inline-block absolute top-0 left-0 right-0 bottom-0"
+                            >
+                              <span className="sr-only">Learn More</span>
+                            </Link>
+                          </>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="text-gray-500">No items yet.</p>
               )}
             </div>
-          );
-        })}
+          </section>
+        </div>
       </div>
-    </div>
+    </main>
   );
 }

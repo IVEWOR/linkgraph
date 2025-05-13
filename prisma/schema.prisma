@@ -76,9 +76,10 @@ model ItemOnInventory {
   itemId      String
   inventory   Inventory @relation(fields: [inventoryId], references: [id])
   inventoryId String
-  customName  String? // user’s rename
+  customName  String? 
   customDesc  String?
   customUrl   String?
+  order       Int       @default(0)
 }
 
 model Tag {
