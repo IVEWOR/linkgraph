@@ -9,6 +9,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function AddItemButton() {
   const [form, setForm] = useState({
@@ -31,6 +32,7 @@ export default function AddItemButton() {
 
     if (res.ok) {
       window.location.reload();
+      router.refresh();
     } else {
       alert("Failed to add item");
     }

@@ -31,6 +31,11 @@ enum SourceType {
   ADMIN
 }
 
+enum UserStatus {
+  ACTIVE
+  DRAFT
+}
+
 model User {
   id          String    @id @default(cuid())
   email       String    @unique
@@ -43,19 +48,39 @@ model User {
   plan        Plan      @default(FREE)
   stripeId    String?   @unique
   inventory   Inventory?
+  status      UserStatus  @default(ACTIVE)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   accounts    Account[]
   sessions    Session[]
 }
 
+model Profile {
+  id          String    @id @default(cuid())
+  name        String
+  username    String?   @unique
+  image       String?   
+  bio         String?   @db.VarChar(300)
+  socialLinks Json?     
+  isPublic    Boolean   @default(true)
+  sourceUrl   String?   
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  inventory   Inventory?
+  inventoryId String?
+}
+
 
 
 model Inventory {
-  id     String            @id @default(cuid())
-  userId String            @unique
-  items  ItemOnInventory[]
-  user   User    @relation(fields: [userId], references: [id])
+  id          String                @id @default(cuid())
+  userId      String?               @unique
+  profileId   String?               @unique
+  items       ItemOnInventory[]
+  
+  user        User?                 @relation(fields: [userId], references: [id])
+  profile     Profile?              @relation(fields: [profileId], references: [id])
 }
 
 model Item {
